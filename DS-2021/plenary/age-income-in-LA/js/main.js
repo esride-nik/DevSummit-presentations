@@ -14,7 +14,9 @@ require([
     "esri/geometry/geometryEngine",
     "esri/layers/GroupLayer",
     "esri/widgets/Bookmarks",
-    "esri/widgets/Expand"
+    "esri/widgets/Expand",
+    "esri/core/urlUtils",
+    "esri/config"
 ], function (
     MapView,
     WebMap,
@@ -31,21 +33,31 @@ require([
     geometryEngine,
     GroupLayer,
     Bookmarks,
-    Expand
+    Expand,
+    urlUtils,
+    esriConfig
 ) {
-    const isMobileBrowser = function() {
+    const isMobileBrowser = function () {
         var check = false;
-        (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+        (function (a) { if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true; })(navigator.userAgent || navigator.vendor || window.opera);
         return check;
-      };
+    };
 
-      if(isMobileBrowser()){
+    if (isMobileBrowser()) {
         document.body.innerHTML = null;
         const mobileMessage = document.createElement("div");
         mobileMessage.classList.add("mobile-message");
         mobileMessage.innerHTML = `This app loads too much data for mobile devices. 🤷‍♀️ Please try again on a desktop browser.`;
         document.body.appendChild(mobileMessage);
-      }
+    }
+
+
+    urlUtils.addProxyRule({
+        urlPrefix: "netzda-mig.maps.arcgis.com",
+        proxyUrl: "http://localhost/DotNet/proxy.ashx"
+    });
+    esriConfig.request.proxyUrl = "http://localhost/DotNet/proxy.ashx";
+    esriConfig.portalUrl = "https://netzda-mig.maps.arcgis.com/";
 
     // App 'globals'
     let sketchViewModel, featureLayerView, pausableWatchHandle, aboveAndBelow, legend, chart, chartDonut;
@@ -122,7 +134,8 @@ require([
     const featureLayer = new FeatureLayer({
         blendMode: "source-in", // will be blended with the buildingFootprints layer
         portalItem: {
-            id: "86e2f7a5de0f4a86b2ff09c8abc4ab87" // CA block group with income
+            // id: "86e2f7a5de0f4a86b2ff09c8abc4ab87" // CA block group with income
+            id: "702af9651ef14b468ff64960e373fd59" // MIG Breitband Privat Panel Privat Gemeindenaggregation https://netzda-mig.maps.arcgis.com/home/item.html?id=702af9651ef14b468ff64960e373fd59
         },
         outFields: ["*"],
         renderer: {
@@ -143,24 +156,26 @@ require([
                     " - " +
                     ageSlider.values[1],
                 stops: [{
-                        value: 0.25,
-                        label: "0.25%",
-                        color: "#474333"
-                    },
-                    {
-                        value: 10,
-                        label: "10%",
-                        color: "#23ccff"
-                    }
+                    value: 0.25,
+                    label: "0.25%",
+                    color: "#474333"
+                },
+                {
+                    value: 10,
+                    label: "10%",
+                    color: "#23ccff"
+                }
                 ]
             }]
         }
     });
 
-    // LA building footprints
-    const buildingFootprints = new TileLayer({
+
+    // const buildingFootprints = new TileLayer({
+    const buildingFootprints = new FeatureLayer({
         portalItem: {
-            id: "7009e50f4c7b4eb7a77fb92cfac3835a"
+            // id: "7009e50f4c7b4eb7a77fb92cfac3835a"   // LA building footprints
+            id: "2b027345a4a74b43b0165afebc2dc303"  // Gebäude NRW https://netzda-mig.maps.arcgis.com/home/item.html?id=2b027345a4a74b43b0165afebc2dc303
         },
         legendEnabled: false,
         renderer: {
@@ -181,14 +196,16 @@ require([
     // create map with basemap
     const map = new WebMap({
         portalItem: {
-            id: "08696a2de81e44cb8110d1bbabb86441"
+            // id: "08696a2de81e44cb8110d1bbabb86441"
+            id: "c18ffd5f76e94a70a580330943a32721" // Köln Gebäude NRW
         }
     });
-    // create view centered on LA
+
+    // create view centered on Cologne
     const view = new MapView({
         container: "viewDiv",
         map,
-        center: [-118.25, 34.0656],
+        center: [6.952776685361778, 50.93453639270271],
         zoom: 13
     });
     // update layer blending at different scales
@@ -201,6 +218,7 @@ require([
             }
         }
     })
+    view.watch("center", (center) => console.log(center));
 
     map.addMany([groupLayer, bufferLayer, graphicsLayer]); // add layers to the map
     generateStats(); // prepare statistics for querying/chart
@@ -323,20 +341,23 @@ require([
     }
     // arcade expression for calculating percentage of age range
     function createAgeRange(low, high) {
-        let str = "var TOT = Sum(";
+        // let str = "var TOT = Sum(";
 
-        for (let age = low; age <= high; age++) {
-            str +=
-                "Number($feature.MAGE" +
-                age +
-                "_CY), Number($feature.FAGE" +
-                age +
-                "_CY)";
-            if (age != high) {
-                str += ",";
-            }
-        }
-        str += ")\n Round(((TOT/$feature.TOTPOP_CY)*100),2)";
+        // for (let age = low; age <= high; age++) {
+        //     str +=
+        //         "Number($feature.MAGE" +
+        //         age +
+        //         "_CY), Number($feature.FAGE" +
+        //         age +
+        //         "_CY)";
+        //     if (age != high) {
+        //         str += ",";
+        //     }
+        // }
+        // str += ")\n Round(((TOT/$feature.TOTPOP_CY)*100),2)";
+
+        const str = `var TOT = Sum(Number($feature.alle_technologien_gtoe_16_mbits), Number($feature.alle_technologien_gtoe_30_mbits),Number($feature.alle_technologien_gtoe_50_mbits), Number($feature.alle_technologien_gtoe_100_mbit),Number($feature.alle_technologien_gtoe_200_mbit), Number($feature.alle_technologien_gtoe_1000_mbi))
+        Round(((TOT / $feature.alle_technologien_gtoe_16_mbits) * 100), 2)`;
         return str;
     }
     // get avg of age range for statistics
@@ -356,15 +377,27 @@ require([
      *******************************************************/
     function updateVisualization() {
         // calculate stats for the given age range
-        const avgStats = [{
-                onStatisticField: findSqlAvg(ageSlider.values[0], ageSlider.values[1]),
-                outStatisticFieldName: "pct_age_population_avg",
-                statisticType: "avg"
+        // const avgStats = [{
+        //     onStatisticField: findSqlAvg(ageSlider.values[0], ageSlider.values[1]),
+        //     outStatisticFieldName: "pct_age_population_avg",
+        //     statisticType: "avg"
+        // },
+        // {
+        //     onStatisticField: findSqlAvg(ageSlider.values[0], ageSlider.values[1]),
+        //     outStatisticFieldName: "pct_age_population_stddev",
+        //     statisticType: "stddev"
+        // }
+        // ];
+        const avgStats = [
+            {
+                "onStatisticField": "(alle_technologien_gtoe_16_mbits + alle_technologien_gtoe_30_mbits + alle_technologien_gtoe_50_mbits + alle_technologien_gtoe_100_mbit + alle_technologien_gtoe_200_mbit + alle_technologien_gtoe_1000_mbi)/alle_technologien_gtoe_16_mbits * 100",
+                "outStatisticFieldName": "pct_age_population_avg",
+                "statisticType": "avg"
             },
             {
-                onStatisticField: findSqlAvg(ageSlider.values[0], ageSlider.values[1]),
-                outStatisticFieldName: "pct_age_population_stddev",
-                statisticType: "stddev"
+                "onStatisticField": "(alle_technologien_gtoe_16_mbits + alle_technologien_gtoe_30_mbits + alle_technologien_gtoe_50_mbits + alle_technologien_gtoe_100_mbit + alle_technologien_gtoe_200_mbit + alle_technologien_gtoe_1000_mbi)/alle_technologien_gtoe_16_mbits * 100",
+                "outStatisticFieldName": "pct_age_population_stddev",
+                "statisticType": "stddev"
             }
         ];
         let query = featureLayerView.createQuery();
@@ -403,32 +436,32 @@ require([
         let stops = [];
         if (aboveAndBelow) {
             stops = [{
-                    value: stats.avg - stats.stddev,
-                    label: Number.parseFloat(stats.avg - stats.stddev).toFixed(2) + "%",
-                    color: "#00ff32"
-                },
-                {
-                    value: stats.avg,
-                    label: Number.parseFloat(stats.avg).toFixed(2) + "%",
-                    color: "#403a42"
-                },
-                {
-                    value: max,
-                    label: Number.parseFloat(max).toFixed(2) + "%",
-                    color: "#bf00ff"
-                }
+                value: stats.avg - stats.stddev,
+                label: Number.parseFloat(stats.avg - stats.stddev).toFixed(2) + "%",
+                color: "#00ff32"
+            },
+            {
+                value: stats.avg,
+                label: Number.parseFloat(stats.avg).toFixed(2) + "%",
+                color: "#403a42"
+            },
+            {
+                value: max,
+                label: Number.parseFloat(max).toFixed(2) + "%",
+                color: "#bf00ff"
+            }
             ];
         } else {
             stops = [{
-                    value: stats.avg - stats.stddev,
-                    label: Number.parseFloat(stats.avg - stats.stddev).toFixed(2) + "%",
-                    color: "#474333"
-                },
-                {
-                    value: max,
-                    label: Number.parseFloat(max).toFixed(2) + "%",
-                    color: "#23ccff"
-                }
+                value: stats.avg - stats.stddev,
+                label: Number.parseFloat(stats.avg - stats.stddev).toFixed(2) + "%",
+                color: "#474333"
+            },
+            {
+                value: max,
+                label: Number.parseFloat(max).toFixed(2) + "%",
+                color: "#23ccff"
+            }
             ];
         }
 
@@ -523,51 +556,82 @@ require([
      ****************************************************/
     async function createDonutChart(ageVal) {
         const query = featureLayerView.createQuery();
+        // query.outStatistics = [{
+        //     statisticType: "sum",
+        //     onStatisticField: ageVal + "I0_CY",
+        //     outStatisticFieldName: "F0_15"
+        // },
+        // {
+        //     statisticType: "sum",
+        //     onStatisticField: ageVal + "I15_CY",
+        //     outStatisticFieldName: "F15_25"
+        // },
+        // {
+        //     statisticType: "sum",
+        //     onStatisticField: ageVal + "I25_CY",
+        //     outStatisticFieldName: "F25_35"
+        // },
+        // {
+        //     statisticType: "sum",
+        //     onStatisticField: ageVal + "I35_CY",
+        //     outStatisticFieldName: "F35_45"
+        // },
+        // {
+        //     statisticType: "sum",
+        //     onStatisticField: ageVal + "I50_CY",
+        //     outStatisticFieldName: "F50_75"
+        // },
+        // {
+        //     statisticType: "sum",
+        //     onStatisticField: ageVal + "I75_CY",
+        //     outStatisticFieldName: "F75_100"
+        // },
+        // {
+        //     statisticType: "sum",
+        //     onStatisticField: ageVal + "I100_CY",
+        //     outStatisticFieldName: "F100_150"
+        // },
+        // {
+        //     statisticType: "sum",
+        //     onStatisticField: ageVal + "I150_CY",
+        //     outStatisticFieldName: "F150_200"
+        // },
+        // {
+        //     statisticType: "sum",
+        //     onStatisticField: ageVal + "I200_CY",
+        //     outStatisticFieldName: "F200_300"
+        // }
+        // ];
         query.outStatistics = [{
-                statisticType: "sum",
-                onStatisticField: ageVal + "I0_CY",
-                outStatisticFieldName: "F0_15"
-            },
-            {
-                statisticType: "sum",
-                onStatisticField: ageVal + "I15_CY",
-                outStatisticFieldName: "F15_25"
-            },
-            {
-                statisticType: "sum",
-                onStatisticField: ageVal + "I25_CY",
-                outStatisticFieldName: "F25_35"
-            },
-            {
-                statisticType: "sum",
-                onStatisticField: ageVal + "I35_CY",
-                outStatisticFieldName: "F35_45"
-            },
-            {
-                statisticType: "sum",
-                onStatisticField: ageVal + "I50_CY",
-                outStatisticFieldName: "F50_75"
-            },
-            {
-                statisticType: "sum",
-                onStatisticField: ageVal + "I75_CY",
-                outStatisticFieldName: "F75_100"
-            },
-            {
-                statisticType: "sum",
-                onStatisticField: ageVal + "I100_CY",
-                outStatisticFieldName: "F100_150"
-            },
-            {
-                statisticType: "sum",
-                onStatisticField: ageVal + "I150_CY",
-                outStatisticFieldName: "F150_200"
-            },
-            {
-                statisticType: "sum",
-                onStatisticField: ageVal + "I200_CY",
-                outStatisticFieldName: "F200_300"
-            }
+            statisticType: "sum",
+            onStatisticField: "alle_technologien_gtoe_16_mbits",
+            outStatisticFieldName: "F0_15"
+        },
+        {
+            statisticType: "sum",
+            onStatisticField: "alle_technologien_gtoe_30_mbits",
+            outStatisticFieldName: "F15_25"
+        },
+        {
+            statisticType: "sum",
+            onStatisticField: "alle_technologien_gtoe_50_mbits",
+            outStatisticFieldName: "F25_35"
+        },
+        {
+            statisticType: "sum",
+            onStatisticField: "alle_technologien_gtoe_100_mbit",
+            outStatisticFieldName: "F35_45"
+        },
+        {
+            statisticType: "sum",
+            onStatisticField: "alle_technologien_gtoe_200_mbit",
+            outStatisticFieldName: "F50_75"
+        },
+        {
+            statisticType: "sum",
+            onStatisticField: "alle_technologien_gtoe_1000_mbi",
+            outStatisticFieldName: "F75_100"
+        }
         ];
 
         const {
@@ -813,7 +877,39 @@ require([
         // Client-side spatial query:
         // Get a sum of age groups for census tracts that intersect the polygon buffer
         const query = featureLayerView.createQuery();
-        query.outStatistics = statDefinitions;
+        // query.outStatistics = statDefinitions;
+        query.outStatistics = [
+            {
+                "onStatisticField": "alle_technologien_gtoe_16_mbits",
+                "outStatisticFieldName": "alle_technologien_gtoe_16_mbits_total",
+                "statisticType": "sum"
+            },
+            {
+                "onStatisticField": "alle_technologien_gtoe_30_mbits",
+                "outStatisticFieldName": "alle_technologien_gtoe_30_mbits_total",
+                "statisticType": "sum"
+            },
+            {
+                "onStatisticField": "alle_technologien_gtoe_50_mbits",
+                "outStatisticFieldName": "alle_technologien_gtoe_50_mbits_total",
+                "statisticType": "sum"
+            },
+            {
+                "onStatisticField": "alle_technologien_gtoe_100_mbit",
+                "outStatisticFieldName": "alle_technologien_gtoe_100_mbit_total",
+                "statisticType": "sum"
+            },
+            {
+                "onStatisticField": "alle_technologien_gtoe_200_mbit",
+                "outStatisticFieldName": "alle_technologien_gtoe_200_mbit_total",
+                "statisticType": "sum"
+            },
+            {
+                "onStatisticField": "alle_technologien_gtoe_1000_mbi",
+                "outStatisticFieldName": "alle_technologien_gtoe_1000_mbi_total",
+                "statisticType": "sum"
+            }
+        ];
         query.geometry = buffer;
 
         // Query the features on the client using FeatureLayerView.queryFeatures
@@ -824,9 +920,9 @@ require([
                 const attributes = results.features[0].attributes;
                 // Loop through attributes and save the values for use in the population pyramid.
                 for (var key in attributes) {
-                    if (key.includes("FAGE")) {
+                    if (key.includes("15") || key.includes("30")) {
                         femaleAgeData.push(attributes[key]);
-                    } else if (key.includes("MAGE")) {
+                    } else if (key.includes("50") || key.includes("100") || key.includes("200") || key.includes("1000")) {
                         // Make 'all male age group population' total negative so that
                         // data will be displayed to the left of female age group
                         maleAgeData.push(-Math.abs(attributes[key]));
@@ -982,19 +1078,19 @@ require([
                     // age groups
                     labels: labels,
                     datasets: [{
-                            label: "Female",
-                            backgroundColor: "#9f9f9f",
-                            borderWidth: 0,
-                            data: femaleAgeData,
-                            barThickness: 2
-                        },
-                        {
-                            label: "Male",
-                            backgroundColor: "#ffffff",
-                            borderWidth: 0,
-                            data: maleAgeData,
-                            barThickness: 2
-                        }
+                        label: "Female",
+                        backgroundColor: "#9f9f9f",
+                        borderWidth: 0,
+                        data: femaleAgeData,
+                        barThickness: 2
+                    },
+                    {
+                        label: "Male",
+                        backgroundColor: "#ffffff",
+                        borderWidth: 0,
+                        data: maleAgeData,
+                        barThickness: 2
+                    }
                     ]
                 },
                 options: {

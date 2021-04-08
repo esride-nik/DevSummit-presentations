@@ -1,0 +1,24 @@
+{
+  "name": "annelfitz_devsummit-presentations",
+  "version": "1.0.0",
+  "description": "Here you can access presentations and demos from the Esri Developer Summit.",
+  "main": "index.js",
+  "dependencies": {
+    "browser-sync": "^2.26.14"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "browser-sync start -s ./DS-2021/plenary/age-income-in-LA -f ./DS-2021/plenary/age-income-in-LA"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/annelfitz/DevSummit-presentations.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/annelfitz/DevSummit-presentations/issues"
+  },
+  "homepage": "https://github.com/annelfitz/DevSummit-presentations#readme"
+}
