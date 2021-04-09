@@ -75,7 +75,7 @@ require([
         centerGeometryAtStart,
         labelGraphic;
 
-    let unit = "miles";
+    let unit = "kilometers";
 
     // slider for age range
     const ageSlider = new Slider({
