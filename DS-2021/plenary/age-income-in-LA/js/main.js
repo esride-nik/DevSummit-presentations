@@ -218,7 +218,7 @@ require([
             }
         }
     })
-    view.watch("center", (center) => console.log(center));
+    // view.watch("center", (center) => console.log(center));
 
     map.addMany([groupLayer, bufferLayer, graphicsLayer]); // add layers to the map
     generateStats(); // prepare statistics for querying/chart
@@ -711,21 +711,8 @@ require([
 
     function generateStats() {
 
-        // TODO: labels must be bandwidths
-        let arr = [];
-        // for (let i = 0; i <= 84; i++) {
-        //     let maleStr = "MAGE" + i + "_CY";
-        //     let femaleStr = "FAGE" + i + "_CY";
-        //     arr.unshift(maleStr, femaleStr);
-        //     if (i == 0) {
-        //         labels.unshift("<1");
-        //     } else {
-        //         labels.unshift(i);
-        //     }
-        // }
-
         labels = ["16 MBit/s", "30 MBit/s", "50 MBit/s", "100 MBbit/s", "200 MBbit/s", "1000 MBit/s"];
-        arr = ["alle_technologien_gtoe_16_mbits", "alle_technologien_gtoe_30_mbits", "alle_technologien_gtoe_50_mbits", "alle_technologien_gtoe_100_mbit", "alle_technologien_gtoe_200_mbit", "alle_technologien_gtoe_1000_mbi"];
+        const arr = ["alle_technologien_gtoe_16_mbits", "alle_technologien_gtoe_30_mbits", "alle_technologien_gtoe_50_mbits", "alle_technologien_gtoe_100_mbit", "alle_technologien_gtoe_200_mbit", "alle_technologien_gtoe_1000_mbi"];
 
         statDefinitions = arr.map(function (fieldName) {
             return {
@@ -888,32 +875,32 @@ require([
             {
                 "onStatisticField": "alle_technologien_gtoe_16_mbits",
                 "outStatisticFieldName": "alle_technologien_gtoe_16_mbits_total",
-                "statisticType": "sum"
+                "statisticType": "avg"
             },
             {
                 "onStatisticField": "alle_technologien_gtoe_30_mbits",
                 "outStatisticFieldName": "alle_technologien_gtoe_30_mbits_total",
-                "statisticType": "sum"
+                "statisticType": "avg"
             },
             {
                 "onStatisticField": "alle_technologien_gtoe_50_mbits",
                 "outStatisticFieldName": "alle_technologien_gtoe_50_mbits_total",
-                "statisticType": "sum"
+                "statisticType": "avg"
             },
             {
                 "onStatisticField": "alle_technologien_gtoe_100_mbit",
                 "outStatisticFieldName": "alle_technologien_gtoe_100_mbit_total",
-                "statisticType": "sum"
+                "statisticType": "avg"
             },
             {
                 "onStatisticField": "alle_technologien_gtoe_200_mbit",
                 "outStatisticFieldName": "alle_technologien_gtoe_200_mbit_total",
-                "statisticType": "sum"
+                "statisticType": "avg"
             },
             {
                 "onStatisticField": "alle_technologien_gtoe_1000_mbi",
                 "outStatisticFieldName": "alle_technologien_gtoe_1000_mbi_total",
-                "statisticType": "sum"
+                "statisticType": "avg"
             }
         ];
         query.geometry = buffer;
@@ -1074,6 +1061,8 @@ require([
     function updateChart(newData) {
         const femaleAgeData = newData[0];
         const maleAgeData = newData[1];
+
+        console.log("UpdateChart", maleAgeData)
 
         if (!chart) {
             // Get the canvas element and render the chart in it
