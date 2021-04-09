@@ -836,6 +836,8 @@ require([
         // Update the buffer polygon
         bufferGraphic.geometry = buffer;
 
+        emphasizeGeometriesInBuffer(buffer);
+
         // Query female and male age groups of the block groups that intersect
         // the buffer polygon on the client
         queryLayerViewAgeStats(buffer).then(function (newData) {
@@ -856,6 +858,18 @@ require([
                 family: "sans-serif"
             }
         };
+    }
+
+
+    function emphasizeGeometriesInBuffer(buffer) {
+        const query = featureLayerView.createQuery();
+        query.geometry = buffer;
+        query.returnGeometry = true;
+        return featureLayerView
+            .queryFeatures(query)
+            .then(function (results) {
+                console.log("geometries in buffer", results.features.map(result => result.attributes.name))
+            });
     }
 
     /*********************************************************************
