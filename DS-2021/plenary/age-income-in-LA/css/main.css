@@ -82,8 +82,8 @@ body {
     height: 100%;
 }
 #population {
-    width: 50%;
-    float: right;
+    /* width: 50%;
+    float: right; */
     margin: auto;
     height: 380px;
 }

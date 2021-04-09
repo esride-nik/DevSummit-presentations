@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>Plenary | Developer Summit 2021</title>
+    <!-- <title>Plenary | Developer Summit 2021</title> -->
+    <title>Bandwith client-side charts</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.css" />
@@ -25,13 +26,13 @@
     <!-- controls for rendering/filtering, made with calcite components -->
     <div id="sidePanel">
         <calcite-tabs id="navTabs" layout="inline" position="above" theme="dark">
-            <calcite-tab-nav slot="tab-nav">
+            <!-- <calcite-tab-nav slot="tab-nav">
                 <calcite-tab-title active="" icon-start="group">Age</calcite-tab-title>
                 <calcite-tab-title icon-start="calculator">Income</calcite-tab-title>
-            </calcite-tab-nav>
+            </calcite-tab-nav> -->
 
             <calcite-tab active="" class="tab">
-                <div id="ageRender">
+                <!-- <div id="ageRender">
                     <h3>Render by age group</h3>
                     <div id="buttonFilters">
                         <p>Choose from a predefined age range:</p>
@@ -42,13 +43,13 @@
                                 Custom
                             </calcite-radio-group-item>
                             <calcite-radio-group-item value="infant" ">
-                                Infants (<1) </calcite-radio-group-item> <calcite-radio-group-item value="child">
-                                    Children (1-11)
+                                Infants (<1) </calcite-radio-group-item> <calcite-radio-group-item value=" child">
+                                Children (1-11)
                             </calcite-radio-group-item>
                             <calcite-radio-group-item value="teen">
                                 Teens (12-17)
                             </calcite-radio-group-item>
-                            <calcite-radio-group-item value="college" checked="" >
+                            <calcite-radio-group-item value="college" checked="">
                                 College Age (18-22)
                             </calcite-radio-group-item>
                             <calcite-radio-group-item value="millenials">
@@ -72,7 +73,7 @@
                             <input type="checkbox" name="setting" value="enabled" />
                         </calcite-switch> Above and below color ramp
                     </label>
-                </div>
+                </div> -->
                 <div id="population">
                     <calcite-card>
                         <div id="chartPanel"><canvas id="chart" height=380 width=800></canvas></div>
@@ -92,7 +93,7 @@
                             <calcite-radio-group-item value="A15"">
                                 15-24
                             </calcite-radio-group-item>
-                            <calcite-radio-group-item value="A25">
+                            <calcite-radio-group-item value=" A25">
                                 25-34
                             </calcite-radio-group-item>
                             <calcite-radio-group-item value="A35">
@@ -110,7 +111,7 @@
                             <calcite-radio-group-item value="A75"">
                                 75+
                             </calcite-radio-group-item>
-                            <input type="hidden" />
+                            <input type=" hidden" />
                         </calcite-radio-group>
                     </div>
                     <div id="stats">
