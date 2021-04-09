@@ -236,50 +236,50 @@ require([
     const playButton = document.getElementById("playButton");
     const incomeSliderDiv = document.getElementById("incomeSliderDivWrapper");
 
-    radio.addEventListener("calciteRadioGroupChange", updateSlider);
+    // radio.addEventListener("calciteRadioGroupChange", updateSlider);
 
-    rendererSwitch.addEventListener("calciteSwitchChange", function (event) {
-        aboveAndBelow = event.detail.switched;
-        updateVisualization();
-    });
+    // rendererSwitch.addEventListener("calciteSwitchChange", function (event) {
+    //     aboveAndBelow = event.detail.switched;
+    //     updateVisualization();
+    // });
 
-    tabs.addEventListener("calciteTabChange", function (event) {
-        if (event.detail.tab == 1) {
-            activeTab = "income";
-            map.removeMany([bufferLayer, graphicsLayer]); // remove sketch/buffer graphics when switching to income tab
-            sketchViewModel.view = null;
-            view.ui.remove(legend);
-            generatePredominanceRenderer(incomeAge); // update renderer
-        } else {
-            activeTab = "age";
-            map.addMany([bufferLayer, graphicsLayer]);
-            pausableWatchHandle.resume();
-            setUpSketch();
-            if (effect) {
-                switchFunction(false)
-                filterSwitch.switched = false;
-            }
-            updateVisualization();
-            view.ui.add(legend, "bottom-left");
-        }
-    });
+    // tabs.addEventListener("calciteTabChange", function (event) {
+    //     if (event.detail.tab == 1) {
+    //         activeTab = "income";
+    //         map.removeMany([bufferLayer, graphicsLayer]); // remove sketch/buffer graphics when switching to income tab
+    //         sketchViewModel.view = null;
+    //         view.ui.remove(legend);
+    //         generatePredominanceRenderer(incomeAge); // update renderer
+    //     } else {
+    //         activeTab = "age";
+    //         map.addMany([bufferLayer, graphicsLayer]);
+    //         pausableWatchHandle.resume();
+    //         setUpSketch();
+    //         if (effect) {
+    //             switchFunction(false)
+    //             filterSwitch.switched = false;
+    //         }
+    //         updateVisualization();
+    //         view.ui.add(legend, "bottom-left");
+    //     }
+    // });
 
-    radioAgeIncome.addEventListener("calciteRadioGroupChange", function (event) {
-        incomeAge = event.detail;
-        generatePredominanceRenderer(incomeAge)
-    });
+    // radioAgeIncome.addEventListener("calciteRadioGroupChange", function (event) {
+    //     incomeAge = event.detail;
+    //     generatePredominanceRenderer(incomeAge)
+    // });
 
-    filterSwitch.addEventListener("calciteSwitchChange", function (event) {
-        switchFunction(event.detail.switched)
-    })
-    // start/stop animation for median income when play button is clicked
-    playButton.addEventListener("click", function () {
-        if (playButton.classList.contains("toggled")) {
-            stopAnimation();
-        } else {
-            startAnimation();
-        }
-    });
+    // filterSwitch.addEventListener("calciteSwitchChange", function (event) {
+    //     switchFunction(event.detail.switched)
+    // })
+    // // start/stop animation for median income when play button is clicked
+    // playButton.addEventListener("click", function () {
+    //     if (playButton.classList.contains("toggled")) {
+    //         stopAnimation();
+    //     } else {
+    //         startAnimation();
+    //     }
+    // });
 
     function switchFunction(switched) {
         if (switched) {
@@ -868,7 +868,11 @@ require([
         return featureLayerView
             .queryFeatures(query)
             .then(function (results) {
-                console.log("geometries in buffer", results.features.map(result => result.attributes.name))
+                const gemeindenHeaderNode = document.getElementById("gemeindenHeader");
+                gemeindenHeaderNode.innerText = ` Prozentuale Versorgung in ${results.features.length} Gemeinden`;
+                const destinationNode = document.getElementById("buttonFilters");
+                destinationNode.innerHTML = "";
+                results.features.map(result => destinationNode.innerHTML += `<ul>${result.attributes.name}</ul>`);
             });
     }
 
