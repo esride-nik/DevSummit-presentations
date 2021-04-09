@@ -137,37 +137,37 @@ require([
             // id: "86e2f7a5de0f4a86b2ff09c8abc4ab87" // CA block group with income
             id: "702af9651ef14b468ff64960e373fd59" // MIG Breitband Privat Panel Privat Gemeindenaggregation https://netzda-mig.maps.arcgis.com/home/item.html?id=702af9651ef14b468ff64960e373fd59
         },
-        outFields: ["*"],
-        renderer: {
-            type: "simple",
-            symbol: {
-                type: "simple-fill",
-                color: "white",
-                outline: null
-            },
-            visualVariables: [{
-                type: "color",
-                valueExpression: createAgeRange(
-                    ageSlider.values[0],
-                    ageSlider.values[1]
-                ),
-                valueExpressionTitle: "Percent of population aged " +
-                    ageSlider.values[0] +
-                    " - " +
-                    ageSlider.values[1],
-                stops: [{
-                    value: 0.25,
-                    label: "0.25%",
-                    color: "#474333"
-                },
-                {
-                    value: 10,
-                    label: "10%",
-                    color: "#23ccff"
-                }
-                ]
-            }]
-        }
+        outFields: ["*"] //,
+        // renderer: {
+        //     type: "simple",
+        //     symbol: {
+        //         type: "simple-fill",
+        //         color: "white",
+        //         outline: null
+        //     },
+        //     visualVariables: [{
+        //         type: "color",
+        //         valueExpression: createAgeRange(
+        //             ageSlider.values[0],
+        //             ageSlider.values[1]
+        //         ),
+        //         valueExpressionTitle: "Percent of population aged " +
+        //             ageSlider.values[0] +
+        //             " - " +
+        //             ageSlider.values[1],
+        //         stops: [{
+        //             value: 0.25,
+        //             label: "0.25%",
+        //             color: "#474333"
+        //         },
+        //         {
+        //             value: 10,
+        //             label: "10%",
+        //             color: "#23ccff"
+        //         }
+        //         ]
+        //     }]
+        // }
     });
 
 
@@ -206,7 +206,7 @@ require([
         container: "viewDiv",
         map,
         center: [6.952776685361778, 50.93453639270271],
-        zoom: 13
+        zoom: 8
     });
     // update layer blending at different scales
     view.watch("scale", function (newValue) {
@@ -710,17 +710,23 @@ require([
     }
 
     function generateStats() {
+
+        // TODO: labels must be bandwidths
         let arr = [];
-        for (let i = 0; i <= 84; i++) {
-            let maleStr = "MAGE" + i + "_CY";
-            let femaleStr = "FAGE" + i + "_CY";
-            arr.unshift(maleStr, femaleStr);
-            if (i == 0) {
-                labels.unshift("<1");
-            } else {
-                labels.unshift(i);
-            }
-        }
+        // for (let i = 0; i <= 84; i++) {
+        //     let maleStr = "MAGE" + i + "_CY";
+        //     let femaleStr = "FAGE" + i + "_CY";
+        //     arr.unshift(maleStr, femaleStr);
+        //     if (i == 0) {
+        //         labels.unshift("<1");
+        //     } else {
+        //         labels.unshift(i);
+        //     }
+        // }
+
+        labels = ["16 MBit/s", "30 MBit/s", "50 MBit/s", "100 MBbit/s", "200 MBbit/s", "1000 MBit/s"];
+        arr = ["alle_technologien_gtoe_16_mbits", "alle_technologien_gtoe_30_mbits", "alle_technologien_gtoe_50_mbits", "alle_technologien_gtoe_100_mbit", "alle_technologien_gtoe_200_mbit", "alle_technologien_gtoe_1000_mbi"];
+
         statDefinitions = arr.map(function (fieldName) {
             return {
                 onStatisticField: fieldName,
@@ -920,13 +926,14 @@ require([
                 const attributes = results.features[0].attributes;
                 // Loop through attributes and save the values for use in the population pyramid.
                 for (var key in attributes) {
-                    if (key.includes("15") || key.includes("30")) {
-                        femaleAgeData.push(attributes[key]);
-                    } else if (key.includes("50") || key.includes("100") || key.includes("200") || key.includes("1000")) {
-                        // Make 'all male age group population' total negative so that
-                        // data will be displayed to the left of female age group
-                        maleAgeData.push(-Math.abs(attributes[key]));
-                    }
+                    // if (key.includes("15") || key.includes("30")) {
+                    //     femaleAgeData.push(attributes[key]);
+                    // } else if (key.includes("50") || key.includes("100") || key.includes("200") || key.includes("1000")) {
+                    //     // Make 'all male age group population' total negative so that
+                    //     // data will be displayed to the left of female age group
+                    //     maleAgeData.push(-Math.abs(attributes[key]));
+                    // }
+                    maleAgeData.push(Math.abs(attributes[key]));
                 }
                 // Return information, seperated by gender
                 return [femaleAgeData, maleAgeData];
@@ -1072,25 +1079,27 @@ require([
             // Get the canvas element and render the chart in it
             const canvasElement = document.getElementById("chart");
 
+            // Chart.js globally imported in html file
             chart = new Chart(canvasElement.getContext("2d"), {
                 type: "horizontalBar",
                 data: {
                     // age groups
                     labels: labels,
-                    datasets: [{
-                        label: "Female",
-                        backgroundColor: "#9f9f9f",
-                        borderWidth: 0,
-                        data: femaleAgeData,
-                        barThickness: 2
-                    },
-                    {
-                        label: "Male",
-                        backgroundColor: "#ffffff",
-                        borderWidth: 0,
-                        data: maleAgeData,
-                        barThickness: 2
-                    }
+                    datasets: [
+                        //     {
+                        //     label: "Female",
+                        //     backgroundColor: "#9f9f9f",
+                        //     borderWidth: 0,
+                        //     data: femaleAgeData,
+                        //     barThickness: 2
+                        // },
+                        {
+                            label: "Bandbreiten",
+                            backgroundColor: "#ffffff",
+                            borderWidth: 0,
+                            data: maleAgeData,
+                            barThickness: 2
+                        }
                     ]
                 },
                 options: {
@@ -1110,7 +1119,7 @@ require([
                             stacked: true,
                             scaleLabel: {
                                 display: true,
-                                labelString: "Age group"
+                                labelString: "Bandbreiten"
                             },
                             gridLines: {
                                 color: 'rgba(255, 255, 255, 0.2)'
@@ -1125,7 +1134,7 @@ require([
                             },
                             scaleLabel: {
                                 display: true,
-                                labelString: "Population"
+                                labelString: "Prozentuale Versorgung"
                             },
                             gridLines: {
                                 color: 'rgba(255, 255, 255, 0.2)'
@@ -1146,8 +1155,8 @@ require([
                 }
             });
         } else {
-            chart.data.datasets[0].data = femaleAgeData;
-            chart.data.datasets[1].data = maleAgeData;
+            // chart.data.datasets[0].data = femaleAgeData;
+            chart.data.datasets[0].data = maleAgeData;
             chart.update();
         }
     }
